@@ -4,17 +4,19 @@
 #██║     ██║   ██║██║╚██╗██║   ██║   ██╔══██╗██╔══██║   ██║   ██║   ██║╚════██║
 #╚██████╗╚██████╔╝██║ ╚████║   ██║   ██║  ██║██║  ██║   ██║   ╚██████╔╝███████║
 # ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝    ╚═════╝ ╚══════╝
-#==============================================================================                                                                              
+#==============================================================================        
+# Por Sieg dev                                                                      
 # Esse skript tem as seguintes funcoes:
 # criar documentos que pode ser pego com /documento
-# criar contratos usando o /contratar
+# criar contratos usando o /contrato
 # promover pessoas com /promover
 # demitir pessoas com /demitir
 
 #======================== Creditos a Sieg/fek_/Felipe
 # https://github.com/feliperobertosouz
 # Codigo autoral, deixe os devivos creditos!
-# Codigo aberto, disponivel em!: 
+# Codigo aberto, disponivel em!: https://github.com/feliperobertosouz/publicSkripts
+# Discord: Sieg#9659
 
 # ============================== ! IMPORTANTE ! ====================
 # Para esse skript funcionar ele depende muito se as permissoes dos grupos e nome dos grupos estao corretamente informados
@@ -26,6 +28,9 @@
 # Exemplo, os grupos alquimista1,alquimista2,alquimista3 devem ter a permissao alquimista
 # e o grupo alquimista4 que é o chefe deve ter as permissoes alquimista4,promover,demitir,contrato
 
+# OUTRO AVISO
+# Se o codigo estiver com problemas falar comigo por favor! eu posso arrumar para voce e fazer o possivel
+# A partir do ponto que voce mexer nas linhas depois de permissoes eu nao me responsabilizo por erros
 
 #============ PERMISSOES
 # Na funcao seguinte esta o codigo para checar se o player é um chefe de profissao e entao responder qual a profissao
@@ -33,16 +38,20 @@
 # Para adicionar novas profissoes apenas adicionar mais uma linha de else if seguindo o padrao a baixo
 # LEMBRANDO QUE ELA SERVE PARA PEGAR 1 PERMISSAO! SE O PLAYER DE ALGUMA FORMA FOR CHEFE DE MAIS DE 1 PROFISSAO ELA N VAI SERVIR
 function Chefe(p: player) :: string:
-    if {_p} has permission "fazendeiro4":
+    if {_p} has permission "chefe.cartorio":
+        return "cartorio"
+    else if {_p} has permission "chefe.fazendeiro":
         return "fazendeiro"
-    else if {_p} has permission "tabelionato4":
-        return "tabelionato"
-    else if {_p} has permission "ferreiro4":
+    else if {_p} has permission "chefe.ferreiro":
         return "ferreiro"
-    else if {_p} has permission "alquimista4":
+    else if {_p} has permission "chefe.alquimista":
         return "alquimista"
-    else if {_p} has permission "cacador4":
+    else if {_p} has permission "chefe.cacador":
         return "cacador"
+    else if {_p} has permission "chefe.cassino":
+        return "cassino"
+    else if {_p} has permission "chefe.construtor":
+        return "construtor"
     else:
         return "indefinido"
 
@@ -83,17 +92,17 @@ command /documento:
 
 # =============================== /contrato
 #O /contrato serve para criar um contrato estando com um documento em branco em maos, ele age de 2 formas dependendo de seu cargo
-#permissao necessario: contrato/op
+#permissao: contrato/op
 # Player comum:
-## Voce deve ser um chefe de profissao e ter a permissao especifica de contrato
-## Voce sendo um player comum deve apenas dar /contrato com o documento em maos e um contrato de sua profissao1 ira surgir na sua mao
+# Voce deve ser um chefe de profissao e ter a permissao especifica de contrato
+# Voce sendo um player comum deve apenas dar /contrato com o documento em maos e um contrato de sua profissao1 ira surgir na sua mao
 #Admin
-## Voce deve ter o documento em branco em maos
-## uma vez que voce use /contrato voce pode inserir um texto, o texto inserido ira criar um contrato referente ao que foi escrito
-## Exemplo "/contrato werewolf" criaria um contrato que adiciona o player que usar no grupo werewolf
+# Voce deve ter o documento em branco em maos
+# uma vez que voce use /contrato voce pode inserir um texto, o texto inserido ira criar um contrato referente ao que foi escrito
+# Exemplo "/contrato werewolf" criaria um contrato que adiciona o player que usar no grupo werewolf
 #Exemplos:
-## /contrato
-## /contrato werewolf
+# /contrato
+# /contrato werewolf
 #======================================= CONTRATO
 command /Contrato [<text>]:
     permission: contrato
@@ -133,7 +142,7 @@ command /Contrato [<text>]:
             remove 1 of tool from tool
             set {_nbt} to nbt compound from {_contrato}
             set tag "Contrato" of {_nbt} to "%{_permissao}%"
-            set name of {_contrato} to "%name of {contrato}% de &5%{_permissao}%"
+            set name of {_contrato} to "&6Contrato de &5%{_permissao}%"
             give the player 1 of {_contrato}
             send "&a você cria um contrato de &5%{_permissao}%" to player
         else:
@@ -144,17 +153,17 @@ command /Contrato [<text>]:
 #O demitir age de duas maneiras diferentes dependendo do seu cargo
 #permissao: demitir/op
 #player comum: 
-## Voce deve ser um chefe de profissao para usar
-## Voce informa logo depois do comando o nick do jogo da pessoa que  voce vai demitir
-## A pessoa precisa estar online
-## Apos esse comando a pessoa sai da lista de trabalhadores podendo usar um contrato denovo
+# Voce deve ser um chefe de profissao para usar
+# Voce informa logo depois do comando o nick do jogo da pessoa que  voce vai demitir
+# A pessoa precisa estar online
+# Apos esse comando a pessoa sai da lista de trabalhadores podendo usar um contrato denovo
 #Admin:
-## voce deve informar o nick da pessoa no primeiro parametro e no segundo qual grupo deseja tirar
-## Esse comando serve quase como um atalho do luck perms
+# voce deve informar o nick da pessoa no primeiro parametro e no segundo qual grupo deseja tirar
+# Esse comando serve quase como um atalho do luck perms
 #Exemplos:
-## /demitir fek_
-## /demitir fek_ fazendeiro3
-## /demitir fek_ werewolf
+# /demitir fek_
+# /demitir fek_ fazendeiro3
+# /demitir fek_ werewolf
 #============= testar se o chefe so consegue demitir gente do cargo dele !!!!!
 #============================================== DEMITIR
 command /Demitir [<player>] [<text>]:
@@ -177,6 +186,7 @@ command /Demitir [<player>] [<text>]:
             stop
         else:
             set {_permissao} to Chefe(player)
+            send "%{_permissao}%" to player
             if {_permissao} is "indefinido":
                 send "&4 você não pode demitir" to player
                 stop
@@ -196,15 +206,16 @@ command /Demitir [<player>] [<text>]:
         #else if player has permission "alquimistachefe":
             #set {_permissao} to "alquimista"
         #PERMISSION CHECH BLOCK CODE ========================
-        if arg-1 has permission {_permissao}:
-            Contrato({_player},"{_permissao}1","remove")
-            Contrato({_player},"{_permissao}2","remove")
-            Contrato({_player},"{_permissao}3","remove")
-            Contrato({_player},"{_permissao}","remove")
-            remove {_player} from {trabalhadores::*}
-            send "&c você remove %{_player}'s display name% da profissão de %{_permissao}%" to player
-        else:
-            send "%{_message}% Voce nao pode demitir alguem que nao trabalha para voce"
+            if arg-1 has permission {_permissao}:
+                send "&4%{_permissao}% " to player
+                send "&3%{_permissao}%1 " to player
+                Contrato(arg-1,"{_permissao}1","remove")
+                Contrato(arg-1,"{_permissao}2","remove")
+                Contrato(arg-1,"{_permissao}3","remove")
+                remove {_player} from {trabalhadores::*}
+                send "&c você remove %{_player}'s display name% da profissão de %{_permissao}%" to player
+            else:
+                send "%{_message}% Voce nao pode demitir alguem que nao trabalha para voce"
 
 #==================================================================
 
@@ -213,17 +224,17 @@ command /Demitir [<player>] [<text>]:
 #O promover funciona de 2 formas diferentes dependendo do seu cargo
 #permissao: promover
 #Player comum
-## Voce deve informar o nick da pessoa como primeiro parametro 
-## Voce deve informar o nivel da promocao de 1 a 3 (sendo 1 praticamente inutil). Se a pessoa informar por exemplo -3 ou 5 nada ira acontecer
-## A pessoa deve estar online
+# Voce deve informar o nick da pessoa como primeiro parametro 
+# Voce deve informar o nivel da promocao de 1 a 3 (sendo 1 praticamente inutil). Se a pessoa informar por exemplo -3 ou 5 nada ira acontecer
+# A pessoa deve estar online
 #Admin:
-## Voce deve informar o nick da pessoa no primeiro parametro
-## Voce deve informar a profissao da pessoa
-## Voce deve informar o nivel da pessoa
-## Esse comando praticamente pode adicionar para voce a pessoa onde voce desejar
+# Voce deve informar o nick da pessoa no primeiro parametro
+# Voce deve informar a profissao da pessoa
+# Voce deve informar o nivel da pessoa
+# Esse comando praticamente pode adicionar para voce a pessoa onde voce desejar
 #Exemplo:
-## /promover fek_ 2
-## /promover fek_ fazendeiro 3
+# /promover fek_ 2
+# /promover fek_ fazendeiro 3
 #====================================== PROMOVER
 #=========================== CHECAR SE A PESSOA SO PODE PROMVOER QUEM TRABALHA PARA ELA
 command /promover [<player>] [<integer>] [<text>]:
@@ -299,10 +310,10 @@ on right click:
         # broadcast "%{_tag}%"
 
 
-#command /nbtSegurando:
-    #permission: admin
-    #trigger:
-        #set {_nbt} to nbt compound from player's held item
-        #send "===================== NBT do ITEM ======================"
-        #send {_nbt} to player
-        #send "===================== NBT do ITEM ======================"
+command /nbtSegurando:
+    permission: admin
+    trigger:
+        set {_nbt} to nbt compound from player's held item
+        send "===================== NBT do ITEM ======================"
+        send {_nbt} to player
+        send "===================== NBT do ITEM ======================"
