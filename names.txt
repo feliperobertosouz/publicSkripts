@@ -1,0 +1,92 @@
+
+#SKRIPT dos NOMES
+#Permissoes necessarias para usar o skript: admin
+on load:
+    set {message} to "&f&l[&2&lNAMES&f&l]:"
+
+#================================ HELP
+command /namesHelp:
+    trigger:
+        send "&6&l             NAMES SK" to player
+        send " " to player
+        send "&3 1-use /nome <nome> para alterar seu nome no servidor." to player 
+        send "&2 2-Após usar o /nome sera solicitado que você use /namesconfirmar" to player
+        send " " to player
+        send "&4 *após o /namesconfirmar você não podera mais usar o /nome !" to player
+        send "&6 *Qualquer abuso como nomes improprios e etc sera punido! " to player
+        if player has permission "admin":
+            send "&f ======================================== " to player
+            send "&6&l ADMIN AREA" to player
+            send "&f ======================================== " to player
+            send " " to player
+            send "&f/namesAlterar <player> <nick> - altera o nome do jogador informado para um novo nick" to player
+            send "&3/namesResetName <player> - permite o jogador informado dar /nome novamente" to player
+
+#=============================================================== namesAlterar
+# Alterarnome é um comando que recebe como parametro o jogador e o nome dele, deve ser usado apenas por admins
+command /namesAlterar [<player>] [<text>]:
+    permission: admin
+    trigger:
+        if player has permission "admin":
+            if arg-1 is not set:
+                send "%{message}% &4 informe um jogador por favor!" to player
+                stop
+            if arg-2 is not set:
+                send "%{message}% &4 informe um nome para o jogador por favor!" to player
+                stop
+            send "%{message}% &6 você mudou o nome de %arg-1% para &f&l %arg-2%" to player
+            console command "/essentials:nick %player% &r%{nome.%player%}%"
+            console command "/tab player %player% customtabname &r%{nome.%player%}%"
+            console command "/tab player %player% customtagname &r%{nome.%player%}%"
+#=========================
+
+#================================================================== TRUENAME
+# Ele funciona para exibir o verdadeiro nome do player
+command /trueName [<text>]:
+    permission: admin
+    trigger:
+        set {_p::*} to all players where [uncolored display name of input is uncolored arg-1]
+        if {_p::1} is set:
+            send "&5Nick de  %arg-1%: &f&l%{_p::1}%" to player
+        else:
+            send "&cNão encontrado" to player
+                
+# =======================================
+
+#================================================================ RESETNOME
+command /namesResetName [<player>]:
+    permission: admin
+    trigger:
+        set {morador.%arg-1%} to false
+        send "%{message}% &5 agora &f&l%arg-1% &5 pode usar &f&l/nome &5 novamente!" to player
+        send "%{message}% &5 agora &f&lVocê &5 pode usar &f&l/nome &5 novamente!" to arg-1
+
+#============================================================== CONFIRMAR
+command /namesconfirmar:
+    trigger:
+        if {morador.%player%} is true:
+            send "%{message}% &4 você não pode usar /nome novamente!" to player
+            stop
+        else:
+            send "%{message}% &6 Você aceita seu nome oficialmente!" to player
+            set {morador.%player%} to true
+            console command "/essentials:nick %player% &r%{nome.%player%}%"
+            console command "/tab player %player% customtabname &r%{nome.%player%}%"
+            console command "/tab player %player% customtagname &r%{nome.%player%}%"
+
+# ==========================
+
+
+#======================================================== NOME
+command /nome [<text>]:
+    trigger:
+        if {morador.%player%} is true:
+            send "%{message}% &4 você não pode usar &f&l/nome &4novamente!" to player
+            stop
+        if arg-1 is not set:
+            send "%{message}% &4 informe um nome por favor!" to player
+            stop
+        send "%{message}% &6 você escolhe &a&l%arg-1% &6como seu nome, tem certeza?" to player
+        send "%{message}% &f se &2&lSIM &f digite &5&l/confirmar &fpara continuar" to player
+        set {nome.%player%} to arg-1
+

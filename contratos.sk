@@ -40,8 +40,8 @@
 function Chefe(p: player) :: string:
     if {_p} has permission "chefe.cartorio":
         return "cartorio"
-    else if {_p} has permission "chefe.fazendeiro":
-        return "fazendeiro"
+    else if {_p} has permission "chefe.fazenda":
+        return "fazenda"
     else if {_p} has permission "chefe.ferreiro":
         return "ferreiro"
     else if {_p} has permission "chefe.alquimista":
@@ -52,6 +52,16 @@ function Chefe(p: player) :: string:
         return "cassino"
     else if {_p} has permission "chefe.construtor":
         return "construtor"
+    else if {_p} has permission "chefe.igreja":
+        return "igreja"
+    else if {_p} has permission "chefe.medicos":
+        return "medicos"
+    else if {_p} has permission "chefe.pescador":
+        return "pescador"
+    else if {_p} has permission "chefe.mercante":
+        return "mercante"
+    else if {_p} has permission "chefe.exercito":
+        return "exercito"
     else:
         return "indefinido"
 
@@ -104,38 +114,20 @@ command /documento:
 # /contrato
 # /contrato werewolf
 #======================================= CONTRATO
-command /Contrato [<text>]:
+command /contrato:
     permission: contrato
     trigger:
         set {_nbt} to nbt compound from player's held item
         set {_tag} to tag "oficial" of {_nbt}
         set {_model} to tag "CustomModelData" of {_nbt}
         if player has permission "admin":
-            set {_permissao} to arg-1
-            if {_permissao} is not set:
-                send "&4 informe uma profissão para criar o contrato" to player
-                stop
+            send "%{message}% &4Por favor use /contratoadm para evitar problemas"
+            stop
         else:
             set {_permissao} to "%Chefe(player)%1"
             if {_permissao} is "indefinido":
-                send "&l[Contratos]: &4 Você não tem permissao para fazer contratos" to player
+                send "%{message}% &4 Você não tem permissao para fazer contratos" to player
                 stop
-        #PERMISSIO CHECK BLOCK CODE ==========================
-        #else if player has permission "fazendeir4":
-            #set {_permissao} to "fazendeiro1"
-        #else if player has permission "mineradorchefe":
-            #set {_permissao} to "minerador"
-        #else if player has permission "escrivaochefe":
-            #set {_permissao} to "escrivao"
-        #else if player has permission "guardachefe":
-            #set {_permissao} to "guarda"
-        #else if player has permission "ferreirochefe":
-            #set {_permissao} to "ferreiro"
-        #else if player has permission "medicochefe":
-            #set {_permissao} to "medico"
-        #else if player has permission "alquimistachefe":
-            #set {_permissao} to "alquimista"
-        #PERMISSION CHECH BLOCK CODE ========================
         if {_tag} is 1:
             play sound "entity.villager.work_cartographer" at player
             set {_contrato} to player's held item named "&6Contrato"
@@ -144,7 +136,7 @@ command /Contrato [<text>]:
             set tag "Contrato" of {_nbt} to "%{_permissao}%"
             set name of {_contrato} to "&6Contrato de &5%{_permissao}%"
             give the player 1 of {_contrato}
-            send "&a você cria um contrato de &5%{_permissao}%" to player
+            send "%{message}%&a você cria um contrato de &5%{_permissao}%" to player
         else:
             send "%{message}%&4 você precisa de um documento vazio para fazer isso"
 #=================================================================================
@@ -166,56 +158,32 @@ command /Contrato [<text>]:
 # /demitir fek_ werewolf
 #============= testar se o chefe so consegue demitir gente do cargo dele !!!!!
 #============================================== DEMITIR
-command /Demitir [<player>] [<text>]:
+command /Demitir [<player>]:
     permission: demitir
     trigger:
         # set {_p::*} to all players where [uncolored display name of input is uncolored arg-1]
         # set {_player} to {_p::1}
         set {_player} to arg-1
         play sound "entity.villager.work_cartographer" at player
-        if player has permission "admin" or "rei":
-            set {_permissao} to arg-2
-            if player has permission "rei":
-                if {_permissao} is "admin":
-                    send "&4 você é o rei mas não pode fazer isso" to player
-                    stop
-            wait 1 tick
-            Contrato({_player},{_permissao},"remove")
-            remove {_player} from {trabalhadores::*}
-            send "&c você remove o jogador %{_player}% da profissão de %{_permissao}%" to player
+        if player has permission "admin":
+            send "%{message}%&4 por favor use /demitiradm para evitar problemas" to player
             stop
         else:
             set {_permissao} to Chefe(player)
-            send "%{_permissao}%" to player
+            #send "%{_permissao}%" to player
             if {_permissao} is "indefinido":
                 send "&4 você não pode demitir" to player
                 stop
-       #PERMISSIO CHECK BLOCK CODE ==========================
-        #else if player has permission "fazendeirochefe":
-            #set {_permissao} to "fazendeiro"
-        #else if player has permission "mineradorchefe":
-            #set {_permissao} to "minerador"
-        #else if player has permission "escrivaochefe":
-            #set {_permissao} to "escrivao"
-       #else if player has permission "guardachefe":
-            #set {_permissao} to "guarda"
-        #else if player has permission "ferreirochefe":
-            #set {_permissao} to "ferreiro"
-        #else if player has permission "medicochefe":
-            #set {_permissao} to "medico"
-        #else if player has permission "alquimistachefe":
-            #set {_permissao} to "alquimista"
-        #PERMISSION CHECH BLOCK CODE ========================
             if arg-1 has permission {_permissao}:
-                send "&4%{_permissao}% " to player
-                send "&3%{_permissao}%1 " to player
-                Contrato(arg-1,"{_permissao}1","remove")
-                Contrato(arg-1,"{_permissao}2","remove")
-                Contrato(arg-1,"{_permissao}3","remove")
+                #send "&4%{_permissao}% " to player
+                #send "&3%{_permissao}%1 " to player
+                Contrato(arg-1,"%{_permissao}%1","remove")
+                Contrato(arg-1,"%{_permissao}%2","remove")
+                Contrato(arg-1,"%{_permissao}%3","remove")
                 remove {_player} from {trabalhadores::*}
                 send "&c você remove %{_player}'s display name% da profissão de %{_permissao}%" to player
             else:
-                send "%{_message}% Voce nao pode demitir alguem que nao trabalha para voce"
+                send "%{message}% &4Voce nao pode demitir alguem que nao trabalha para voce"
 
 #==================================================================
 
@@ -237,32 +205,70 @@ command /Demitir [<player>] [<text>]:
 # /promover fek_ fazendeiro 3
 #====================================== PROMOVER
 #=========================== CHECAR SE A PESSOA SO PODE PROMVOER QUEM TRABALHA PARA ELA
-command /promover [<player>] [<integer>] [<text>]:
+command /promover [<player>] [<integer>]:
     permission: promover
     trigger:
         if player has permission "admin":
-            set {_permissao} to arg-3
-            send "promovido o player %arg-1% para %arg-3%%arg-2%" to player
+            send "%{message}%&4 Por favor use /promoveradm para evitar problemas" to player
+            stop
         else:
             set {_permissao} to Chefe(player)
-            send {_permissao} to player
             if arg-1 has permission {_permissao}:
                 set {_nivel} to arg-2
+                if {_nivel} is not set:
+                    send "%{message}%&4Por favor insira um nivel para promover seu funcionario" to player
+                    stop
+                if {_nivel} < 1:
+                    send "%{message}%&4 Você deve inserir um nivel valido de 1 a 3" to player
+                    stop
                 if {_nivel} > 3:
                     send "você não pode fazer isso, voce so pode promover para 1 a 3" to player
                     stop
                 else:
                     set {_nivel} to arg-2
                     set {_promocao} to "%{_permissao}%%{_nivel}%"
-                    send "voce promove a pessoa para %{_promocao}%" to player
+                    send "%{message}%&6 voce promove a pessoa para &f %{_promocao}%" to player
+                    Contrato(arg-1,"%{_permissao}%1","remove")
+                    Contrato(arg-1,"%{_permissao}%2","remove")
+                    Contrato(arg-1,"%{_permissao}%3","remove")
                     Contrato(arg-1,{_promocao},"add")
             else:
-                send "Voce nao pode promover alguem que nao trabalha para voce" to player
-        send {_promocao} to player
-                
+                send "%{message}%&4Voce nao pode promover alguem que nao trabalha para voce" to player
+
+on tab complete of "/promover":
+    set tab completions for position 2 to "1" ,"2" and "3"           
 # =========================================
 
 
+#================================================ /contratohelp
+#O /contratohelp serve para ajudar os jogadores a saber como usar os comandos em jogo
+
+command /contratohelp [<text>]:
+    trigger:
+        send "&f===========" to player
+        send "&6CONTRATOS &2&lHELPER" to player
+        send "&f=========="
+        if arg-1 is not set:
+            send "&f /contratohelp &3contrato &f para ajuda sobre como criar contratos" to player
+            send "&f /contratohelp &6promover &f para ajuda sobre como promover alguem" to player
+            send "&f /contratohelp &5demitir &f para ajuda sobre como demitir alguem" to player
+        else if arg-1 is "contrato":
+            send "&6&l CONTRATOS" to player
+            send "voce só pode fazer contratos se for chefe de uma profissao" to player
+            send "para criar um contrato pegue um &3&lDocumento em branco &fna mao e de /contrato" to player 
+            send "automaticamente o documento em branco se tornara um contrato de nivel 1 da sua profissao se voce for chefe" to player
+        else if arg-1 is "promover":
+            send "&6&l PROMOVER" to player
+            send "voce so pode promover pessoas que trabalhem para voce" to player
+            send "voce deve informar o nick da pessoa e entao o nivel que voce quer promover, 2 a 3" to player
+            send "se voce quiser rebaixar alguem apenas informar um numero a baixo, por exemplo 1" to player
+        else if arg-1 is "demitir":
+            send "&6&l DEMITIR" to player
+            send "voce so pode demitir gente que trabalha para voce" to player
+            send "voce deve informar o nick do player e ele sera demitido automaticamente da profissao que voce é chefe" to player
+
+on tab complete of "/contratohelp":
+    set tab completions for position 1 to "contrato" ,"promover" and "demitir"
 #========================= /naotrabalhador
 #Esse comando serve para tirar uma pessoa da lista de trabalhadores permitindo ela usar contratos novamente
 #Serve para arrumar erros e testes quando o /demitir nao funcionar por alguma razao
@@ -274,6 +280,79 @@ command /naotrabalhador [<player>]:
 #==============================================
 
 
+#==================== ADMIN ADMIN ADMIN ADMIN ADMIN ADMIN ADMIN ADMIN ADMIN ADMIN ADMIN ADMIN ADMIN ADMIN
+
+command /contratoadm [<player>] [<text>]:
+    permission: admin
+    trigger:
+        set {_nbt} to nbt compound from {Documento}
+        set {_tag} to tag "oficial" of {_nbt}
+        set {_model} to tag "CustomModelData" of {_nbt}
+        if player has permission "admin":
+            if {_tag} is 1:
+                set {_permissao} to arg-2
+                play sound "entity.villager.work_cartographer" at player
+                set {_contrato} to {Documento}
+                set {_nbt} to nbt compound from {_contrato}
+                set tag "Contrato" of {_nbt} to "%{_permissao}%"
+                set name of {_contrato} to "&6Contrato de &5%{_permissao}%"
+                give the player 1 of {_contrato}
+                send "%{message}%&a você cria um contrato de &5%{_permissao}%" to player
+            else:
+                send "%{message}%&4 você precisa de um documento vazio para fazer isso"
+
+on tab complete of "/contratoadm":
+    set tab completions for position 2 to "exercito", "exercito1", "exercito2", "exercito3", "igreja","igreja1","igreja2","igreja3","cartorio","cartorio1", "cartorio2", "cartorio3", "cassino","cassino1","cassino2","cassino3","construtor","construtor1", "construtor2", "construtor3", "medicos","medicos1", "medicos2", "medicos3" and "outros"
+
+#==================== ADMIN ADMIN ADMIN ADMIN ADMIN ADMIN ADMIN ADMIN ADMIN ADMIN ADMIN ADMIN ADMIN ADMIN
+
+command /demitiradm [<player>] [<text>]:
+    permission: admin
+    trigger:
+        set {_permissao} to arg-2
+        Contrato(arg-1,{_permissao}, "remove")
+        Contrato(arg-1,"%{_permissao}%1","remove")
+        Contrato(arg-1,"%{_permissao}%2","remove")
+        Contrato(arg-1,"%{_permissao}%3","remove")
+        remove {_player} from {trabalhadores::*}
+        send "&c você remove %{_player}'s display name% da profissão de %{_permissao}%" to player
+
+on tab complete of "/demitiradm":
+    set tab completions for position 2 to "exercito", "exercito1", "exercito2", "exercito3", "igreja","igreja1","igreja2","igreja3","cartorio","cartorio1", "cartorio2", "cartorio3", "cassino","cassino1","cassino2","cassino3","construtor","construtor1", "construtor2", "construtor3", "medicos","medicos1", "medicos2", "medicos3" and "outros"
+
+#==================== ADMIN ADMIN ADMIN ADMIN ADMIN ADMIN ADMIN ADMIN ADMIN ADMIN ADMIN ADMIN ADMIN ADMIN
+command /promoveradm [<player>] [<text>] [<integer>]:
+    permission: promoveradm
+    trigger:
+        if player has permission "admin":
+            set {_permissao} to arg-2
+            if arg-1 has permission {_permissao}:
+                set {_nivel} to arg-2
+                if {_nivel} is not set:
+                    send "%{message}% &6Por favor insira um nivel para promover seu funcionario" to player
+                    stop
+                if {_nivel} < 1:
+                    send "%{message}%&6 Você deve inserir um nivel valido de &f1 a 3" to player
+                    stop
+                if {_nivel} > 3:
+                    send "%{message}%&6 você não pode fazer isso, voce so pode promover para &f1 a 3" to player
+                    stop
+                else:
+                    set {_nivel} to arg-2
+                    set {_promocao} to "%{_permissao}%%{_nivel}%"
+                    send "voce promove a pessoa para %{_promocao}%" to player
+                    Contrato(arg-1,"%{_permissao}%1","remove")
+                    Contrato(arg-1,"%{_permissao}%2","remove")
+                    Contrato(arg-1,"%{_permissao}%3","remove")
+                    Contrato(arg-1,{_promocao},"add")
+
+on tab complete of "/promoveradm":
+    set tab completions for position 2 to "1" ,"2" and "3"  
+    set tab completions for position 3 to "exercito", "exercito1", "exercito2", "exercito3", "igreja","igreja1","igreja2","igreja3","cartorio","cartorio1", "cartorio2", "cartorio3", "cassino","cassino1","cassino2","cassino3","construtor","construtor1", "construtor2", "construtor3", "medicos","medicos1", "medicos2", "medicos3" and "outros"
+    
+
+         
+#=====================
 #================================== USAR O CONTRATO
 #Os contratos possuem em seu titulo o nome do grupo informado neles
 #Todavia seu titulo é meramente visual, ou seja um rename nao influenciaria em nada
